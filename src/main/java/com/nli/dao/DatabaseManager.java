@@ -1,4 +1,5 @@
 package com.nli.dao;
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.*;
 
@@ -22,5 +23,23 @@ public class DatabaseManager {
         }
         return conn;
     }
-
+    public void testMetadataExtraction(){
+        try(Connection conn = getConnection()){
+            DatabaseMetaData metaData = conn.getMetaData();
+            System.out.println("Scanning for employees: \n");
+            ResultSet rs = metaData.getColumns(null,null,"employees",null);
+            while(rs.next()){
+                String columnName=rs.getString("COLUMN_NAME");
+                String columnType=rs.getString("TYPE_NAME");
+                System.out.println("- " + columnName + " (" + columnType + ")");
+            }
+            System.out.println("-------------------------");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    public static void main(String[] args){
+        DatabaseManager db = new DatabaseManager();
+        db.testMetadataExtraction();
+    }
 }
