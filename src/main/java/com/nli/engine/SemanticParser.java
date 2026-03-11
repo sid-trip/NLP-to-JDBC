@@ -21,6 +21,11 @@ public class SemanticParser {
         stopWords.add("tell");
         stopWords.add("help");
         stopWords.add("out");
+        stopWords.add("find");
+        stopWords.add("me");
+        stopWords.add("all");
+        stopWords.add("is");
+        stopWords.add("the");
     }
     /*
     This function is used to generate the SQL query.
@@ -31,7 +36,14 @@ public class SemanticParser {
     the last condition is to check whether the given word is a number as in the number of rows to be returned
      */
     public String parse(String input, List<String> dbcloumns){
-        input = input.toLowerCase().replaceAll("[^a-zA-Z0-9 ]","");
+        input = input.toLowerCase();
+        input = input.replace("no more than", "lesser")
+                .replace("not more than", "lesser")
+                .replace("more than", "greater")
+                .replace("greater than", "greater")
+                .replace("less than", "lesser")
+                .replace("equal to", "equal");
+        input = input.replaceAll("[^a-zA-Z0-9 ]","");
         String[] words = input.split("\\s+");
         String table = "employees";
         String colFound = "";
@@ -62,7 +74,7 @@ public class SemanticParser {
 
         List<String> mockColumns = Arrays.asList("emp_id", "name", "salary", "city", "department");
 
-        String testInput = "Show me employees where salary is above 60000";
+        String testInput = "Find me all the employees where the emp_id is more than 50";
         String resultSql = parser.parse(testInput, mockColumns);
 
         System.out.println("User Said: " + testInput);
