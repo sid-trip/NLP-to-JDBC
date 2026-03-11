@@ -26,6 +26,7 @@ public class SemanticParser {
         stopWords.add("all");
         stopWords.add("is");
         stopWords.add("the");
+        stopWords.addAll(Arrays.asList("all", "the", "is", "a", "an", "than", "where"));
     }
     /*
     This function is used to generate the SQL query.
@@ -43,7 +44,7 @@ public class SemanticParser {
                 .replace("greater than", "greater")
                 .replace("less than", "lesser")
                 .replace("equal to", "equal");
-        input = input.replaceAll("[^a-zA-Z0-9 ]","");
+        input = input.replaceAll("[^a-zA-Z0-9_ ]","");
         String[] words = input.split("\\s+");
         String table = "employees";
         String colFound = "";
@@ -74,7 +75,7 @@ public class SemanticParser {
 
         List<String> mockColumns = Arrays.asList("emp_id", "name", "salary", "city", "department");
 
-        String testInput = "Find me all the employees where the emp_id is more than 50";
+        String testInput = "find me the employees whose name who live in the city Bangalore";
         String resultSql = parser.parse(testInput, mockColumns);
 
         System.out.println("User Said: " + testInput);
