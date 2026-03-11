@@ -3,71 +3,90 @@ import java.util.*;
 public class SemanticParser {
     private Map<String, String> operators = new HashMap<>();
     private List<String> stopWords = new ArrayList<>();
-    public SemanticParser(){
+    private Map<String, List<String>> SchemaMap = new HashMap<>();
+
+    public SemanticParser(Map<String, List<String>> databaseSchema) {
+        this.SchemaMap = databaseSchema;
         //ALL OPERATIONS THAT WOULD BE DETERMINING GREATER OR LESSER THAN THE GIVEN
-        operators.put("above",">");
-        operators.put("below","<");
-        operators.put("more",">");
-        operators.put("less","<");
-        operators.put("greater",">");
-        operators.put("lesser","<");
-        operators.put("higher",">");
-        operators.put("lower","<");
+        operators.put("above", ">");
+        operators.put("below", "<");
+        operators.put("more", ">");
+        operators.put("less", "<");
+        operators.put("greater", ">");
+        operators.put("lesser", "<");
+        operators.put("higher", ">");
+        operators.put("lower", "<");
         //WASTE WORDS OR WORDS THAT HOLD NO VALUE
-        stopWords.add("please");
-        stopWords.add("um");
-        stopWords.add("could");
-        stopWords.add("you");
-        stopWords.add("tell");
-        stopWords.add("help");
-        stopWords.add("out");
-        stopWords.add("find");
-        stopWords.add("me");
-        stopWords.add("all");
-        stopWords.add("is");
-        stopWords.add("the");
-        stopWords.addAll(Arrays.asList("all", "the", "is", "a", "an", "than", "where"));
+//        stopWords.add("please");
+//        stopWords.add("um");
+//        stopWords.add("could");
+//        stopWords.add("you");
+//        stopWords.add("tell");
+//        stopWords.add("help");
+//        stopWords.add("out");
+//        stopWords.add("find");
+//        stopWords.add("me");
+//        stopWords.add("all");
+//        stopWords.add("is");
+//        stopWords.add("the");
+//        stopWords.addAll(Arrays.asList("all", "the", "is", "a", "an", "than", "where"));
+//
     }
+
     /*
-    This function is used to generate the SQL query.
-    Logic: we get the string from the user, split and clean the input.
-    if the cleaned input has words which are in our list of stop words, we dont do anything about them
-    if one of the words is a column name in the given table, we add it to the colFound String.
-    if one of the words is a word we used to map the operators, we get that operator using .containsKey()
-    the last condition is to check whether the given word is a number as in the number of rows to be returned
-     */
-    public String parse(String input, List<String> dbcloumns){
-        input = input.toLowerCase();
-        input = input.replace("no more than", "lesser")
-                .replace("not more than", "lesser")
-                .replace("more than", "greater")
-                .replace("greater than", "greater")
-                .replace("less than", "lesser")
-                .replace("equal to", "equal");
-        input = input.replaceAll("[^a-zA-Z0-9_ ]","");
+    Change: changing from hardcoded to dynamically getting the DB table name and the searching for the columns names,
+    checking the operators present, and if the sentence contains any numbers
+    */
+    public String parse(String input, List<String> dbcloumns) {
+        input = input.toLowerCase().replaceAll("[^a-zA-Z0-9_ ]", "");
         String[] words = input.split("\\s+");
-        String table = "employees";
+        String tableFound = "";
         String colFound = "";
         String opFound = "";
         String valFound = "";
-        for (String word : words){
-            if(stopWords.contains(word)){
+        for (String word : words) {
+            if (SchemaMap.containsKey(word)) {
+                tableFound = word;
                 continue;
             }
-            if(dbcloumns.contains(word)){
-                colFound = word;
-            }
-            else if(operators.containsKey(word)){
+            if (!tableFound.isEmpty()) {
+                List<String> columns = SchemaMap.get(tableFound);
+                if (columns.contains(word)) {
+                    colFound = word;
+                    continue;
+                }
+            } else if (operators.containsKey(word)) {
                 opFound = operators.get(word);
-            }
-            else if(word.matches("\\d+")){
+            } else if (word.matches("\\d+")) {
                 valFound = word;
+            } else if (!word.equals(tableFound) && !colFound.isEmpty()) {
+                valFound = "'" + word + "'";
             }
         }
-        if (colFound.isEmpty() || opFound.isEmpty() || valFound.isEmpty()) {
-            return "SELECT * FROM " + table;
+        if (tableFound.isEmpty()) tableFound = SchemaMap.keySet().iterator().next();
+
+        return "SELECT * FROM " + tableFound + " WHERE " + colFound + " " + opFound + " " + valFound;
+    }
+
+    public float getSimilarity(String s1, String s2) {
+        int i =0;
+        float count =0;
+        char[] c2 = s2.toCharArray();
+        char[] c1 = s1.toCharArray();
+        char[] big, small;
+        if (c1.length>=c2.length){
+            big = c1;
+            small = c2;
+        }else{
+            small = c1;
+            big = c2;
         }
-        return "SELECT * FROM " + table + " WHERE " + colFound + " " + opFound + " " + valFound;
+        for (i = 0; i<small.length; i++){
+            if (c1[i]==c2[i]){
+                count++;
+            }
+        }
+        return count/big.length;
     }
 
     public static void main(String[] args) {
