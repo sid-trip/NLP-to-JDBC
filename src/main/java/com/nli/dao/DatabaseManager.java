@@ -1,5 +1,6 @@
 package com.nli.dao;
-import javax.xml.crypto.Data;
+import javax.print.DocFlavor;
+import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.*;
 
@@ -41,5 +42,24 @@ public class DatabaseManager {
     public static void main(String[] args){
         DatabaseManager db = new DatabaseManager();
         db.testMetadataExtraction();
+    }
+    public Map<String,List<String>> getFullSchema(){
+        Map<String, List<String>> schema = new HashMap<>();
+        try(Connection conn = getConnection()){
+            DatabaseMetaData meta = conn.getMetaData();
+            ResultSet tables = meta.getTables(null,null,"%",new String[]{"TABLE"});
+            while(tables.next()) {
+                String tableName = tables.getString("TABLE_NAME");
+                List<String> columns = new ArrayList<>();
+                ResultSet cols = meta.getColumns(null, null, tableName, "%");
+                while(cols.next()){
+                    columns.add(cols.getString("COLUMN_NAME").toLowerCase());
+                }
+                schema.put(tableName.toLowerCase(),columns);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return schema;
     }
 }

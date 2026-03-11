@@ -2,7 +2,6 @@ package com.nli.engine;
 import java.util.*;
 public class SemanticParser {
     private Map<String, String> operators = new HashMap<>();
-    private List<String> stopWords = new ArrayList<>();
     private Map<String, List<String>> SchemaMap = new HashMap<>();
 
     public SemanticParser(Map<String, List<String>> databaseSchema) {
@@ -107,7 +106,7 @@ public class SemanticParser {
             }
         }
         int distance = dp[n][m];
-        return (float)distance/Math.max(n,m);
+        return 1.0f - (float)distance/Math.max(n,m);
     }
 
     public static void main(String[] args) {
