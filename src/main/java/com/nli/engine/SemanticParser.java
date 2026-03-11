@@ -31,8 +31,8 @@ public class SemanticParser {
     the last condition is to check whether the given word is a number as in the number of rows to be returned
      */
     public String parse(String input, List<String> dbcloumns){
-        input = input.toLowerCase().replaceAll("[^a-zA-Z0-9]","");
-        String[] words = input.split(" \\s+");
+        input = input.toLowerCase().replaceAll("[^a-zA-Z0-9 ]","");
+        String[] words = input.split("\\s+");
         String table = "employees";
         String colFound = "";
         String opFound = "";
@@ -47,7 +47,7 @@ public class SemanticParser {
             else if(operators.containsKey(word)){
                 opFound = operators.get(word);
             }
-            else if(word.matches("\\d")){
+            else if(word.matches("\\d+")){
                 valFound = word;
             }
         }
@@ -55,5 +55,17 @@ public class SemanticParser {
             return "SELECT * FROM " + table;
         }
         return "SELECT * FROM " + table + " WHERE " + colFound + " " + opFound + " " + valFound;
+    }
+
+    public static void main(String[] args) {
+        SemanticParser parser = new SemanticParser();
+
+        List<String> mockColumns = Arrays.asList("emp_id", "name", "salary", "city", "department");
+
+        String testInput = "Show me employees where salary is above 60000";
+        String resultSql = parser.parse(testInput, mockColumns);
+
+        System.out.println("User Said: " + testInput);
+        System.out.println("Generated SQL: " + resultSql);
     }
 }
