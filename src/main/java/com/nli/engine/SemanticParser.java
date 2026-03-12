@@ -1,11 +1,10 @@
 package com.nli.engine;
-import java.awt.datatransfer.FlavorEvent;
-import java.sql.Array;
+import com.nli.dao.DatabaseManager;
 import java.util.*;
 public class SemanticParser {
     final private Map<String, String> operators = new HashMap<>();
-    private List<String> stopWords = new ArrayList<>();
-    private Map<String, List<String>> SchemaMap = new HashMap<>();
+    final private List<String> stopWords = new ArrayList<>();
+    final private Map<String, List<String>> SchemaMap;
 
     public SemanticParser(Map<String, List<String>> databaseSchema) {
         this.SchemaMap = databaseSchema;
@@ -20,27 +19,13 @@ public class SemanticParser {
         operators.put("lower", "<");
         //WASTE WORDS OR WORDS THAT HOLD NO VALUE
         stopWords.addAll(Arrays.asList("please", "find", "me", "show", "all", "the", "a", "an", "where", "whose", "having", "with", "than", "live", "located"));
-//        stopWords.add("please");
-//        stopWords.add("um");
-//        stopWords.add("could");
-//        stopWords.add("you");
-//        stopWords.add("tell");
-//        stopWords.add("help");
-//        stopWords.add("out");
-//        stopWords.add("find");
-//        stopWords.add("me");
-//        stopWords.add("all");
-//        stopWords.add("is");
-//        stopWords.add("the");
-//        stopWords.addAll(Arrays.asList("all", "the", "is", "a", "an", "than", "where"));
-//
     }
 
     /*
     Change: changing from hardcoded to dynamically getting the DB table name and the searching for the columns names,
     checking the operators present, and if the sentence contains any numbers
     */
-    public String parse(String input, List<String> dbcloumns) {
+    public String parse(String input) {
         input = input.toLowerCase().replaceAll("[^a-zA-Z0-9_ ]", "");
         String originalInput = input;
         String[] words = input.split("\\s+");
@@ -123,7 +108,6 @@ public class SemanticParser {
                     dp[i][j] = Math.min(dp[i - 1][j - 1] + (s1.charAt(i - 1) == s2.charAt(j - 1) ? 0 : 1),
                             Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1));
                 }
-                int distance = dp[n][m];
             }
         }
         int distance = dp[n][m];
@@ -138,14 +122,12 @@ public class SemanticParser {
     }
 
     public static void main(String[] args) {
-        SemanticParser parser = new SemanticParser();
-
-        List<String> mockColumns = Arrays.asList("emp_id", "name", "salary", "city", "department");
-
-        String testInput = "find me the employees whose name who live in the city Bangalore";
-        String resultSql = parser.parse(testInput, mockColumns);
-
-        System.out.println("User Said: " + testInput);
-        System.out.println("Generated SQL: " + resultSql);
+        DatabaseManager db = new DatabaseManager();
+        Map<String,List<String>> scheme = db.getFullSchema();
+        SemanticParser parser = new SemanticParser(scheme);
+        String testInput = "find me the employees who live in the city Bangalore";
+        String result = parser.parse(testInput);
+        System.out.println("User said: "+testInput);
+        System.out.println("Result: "+result);
     }
 }
