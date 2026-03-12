@@ -22,7 +22,7 @@ public class SemanticParser {
         operators.put("from", "=");
         operators.put("named", "=");
         //WASTE WORDS OR WORDS THAT HOLD NO VALUE
-        stopWords.addAll(Arrays.asList("please", "find", "me", "show", "all", "the", "a", "an", "where", "whose", "having", "with", "than", "live", "located"));
+        stopWords.addAll(Arrays.asList("please", "find", "me", "show", "all", "the", "a", "an", "where", "whose", "having", "with", "than", "located"));
     }
 
     /*
@@ -101,8 +101,8 @@ public class SemanticParser {
         int n = s1.length();
         int m = s2.length();
         int[][] dp = new int[n+1][m+1];
-        for(int i = 0;i<n;i++){
-            for(int j = 0;j<m;j++){
+        for(int i = 0;i<=n;i++){
+            for(int j = 0;j<=m;j++){
                 if(i==0){
                     dp[i][j]=j;
                 }
@@ -119,7 +119,7 @@ public class SemanticParser {
     }
     public String recoverCase(String word, String original){
         for(String s : original.split(" ")){
-            String cleanS = s.replaceAll("^A-Za-z0-9_","");
+            String cleanS = s.replaceAll("[^A-Za-z0-9_]","");
             if(word.equalsIgnoreCase(cleanS)) return cleanS;
         }
         return word;
