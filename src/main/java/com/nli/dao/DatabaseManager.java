@@ -47,7 +47,7 @@ public class DatabaseManager {
         Map<String, List<String>> schema = new HashMap<>();
         try(Connection conn = getConnection()){
             DatabaseMetaData meta = conn.getMetaData();
-            ResultSet tables = meta.getTables(null,null,"%",new String[]{"TABLE"});
+            ResultSet tables = meta.getTables("vtu_project",null,"%",new String[]{"TABLE"});
             while(tables.next()) {
                 String tableName = tables.getString("TABLE_NAME");
                 List<String> columns = new ArrayList<>();

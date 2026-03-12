@@ -17,6 +17,10 @@ public class SemanticParser {
         operators.put("lesser", "<");
         operators.put("higher", ">");
         operators.put("lower", "<");
+        operators.put("is", "=");
+        operators.put("in", "=");
+        operators.put("from", "=");
+        operators.put("named", "=");
         //WASTE WORDS OR WORDS THAT HOLD NO VALUE
         stopWords.addAll(Arrays.asList("please", "find", "me", "show", "all", "the", "a", "an", "where", "whose", "having", "with", "than", "live", "located"));
     }
