@@ -8,7 +8,7 @@ public class DatabaseManager {
     private static final String URL = "jdbc:mysql://localhost:3306/vtu_project";
     private static final String USER = "javauser";
     private static final String PASS = "root";
-    /* Gettind a connection to work:
+    /* Getting a connection to work:
     So, first we get the var conn as null so if it fails, it fails,
     First we get the Driver set up into the memory so java can run the .jar file for mariadb
     Then we try to get the conn using DriverManager.getConnection(URL,USER,PASS) to establish a connection
@@ -26,7 +26,7 @@ public class DatabaseManager {
     }
     public void testMetadataExtraction(){
         try(Connection conn = getConnection()){
-            DatabaseMetaData metaData = conn.getMetaData();
+            DatabaseMetaData metaData = conn.getMetaData(); //finds the metadata of the database
             System.out.println("Scanning for employees: \n");
             ResultSet rs = metaData.getColumns(null,null,"employees",null);
             while(rs.next()){

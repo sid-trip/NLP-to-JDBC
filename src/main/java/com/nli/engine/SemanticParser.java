@@ -42,6 +42,7 @@ public class SemanticParser {
     */
     public String parse(String input, List<String> dbcloumns) {
         input = input.toLowerCase().replaceAll("[^a-zA-Z0-9_ ]", "");
+        String originalInput = input;
         String[] words = input.split("\\s+");
         String tableFound = "";
         String colFound = "";
@@ -127,6 +128,13 @@ public class SemanticParser {
         }
         int distance = dp[n][m];
         return 1.0f - (float)distance/Math.max(n,m);
+    }
+    public String recoverCase(String word, String original){
+        for(String s : original.split(" ")){
+            String cleanS = s.replaceAll("^A-Za-z0-9_","");
+            if(word.equalsIgnoreCase(cleanS)) return cleanS;
+        }
+        return word;
     }
 
     public static void main(String[] args) {
