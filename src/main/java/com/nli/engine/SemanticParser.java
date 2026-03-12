@@ -1,7 +1,10 @@
 package com.nli.engine;
+import java.awt.datatransfer.FlavorEvent;
+import java.sql.Array;
 import java.util.*;
 public class SemanticParser {
-    private Map<String, String> operators = new HashMap<>();
+    final private Map<String, String> operators = new HashMap<>();
+    private List<String> stopWords = new ArrayList<>();
     private Map<String, List<String>> SchemaMap = new HashMap<>();
 
     public SemanticParser(Map<String, List<String>> databaseSchema) {
@@ -16,6 +19,7 @@ public class SemanticParser {
         operators.put("higher", ">");
         operators.put("lower", "<");
         //WASTE WORDS OR WORDS THAT HOLD NO VALUE
+        stopWords.addAll(Arrays.asList("please", "find", "me", "show", "all", "the", "a", "an", "where", "whose", "having", "with", "than", "live", "located"));
 //        stopWords.add("please");
 //        stopWords.add("um");
 //        stopWords.add("could");
@@ -44,27 +48,26 @@ public class SemanticParser {
         String opFound = "";
         String valFound = "";
         for (String word : words) {
-            if (SchemaMap.containsKey(word)) {
-                tableFound = word;
-                continue;
-            }
-            if (!tableFound.isEmpty()) {
-                List<String> columns = SchemaMap.get(tableFound);
-                if (columns.contains(word)) {
-                    colFound = word;
-                    continue;
+            if(stopWords.contains(word)) continue;
+            //Finding the tableName and assigning it to tableFound
+            for(String tableName : SchemaMap.keySet()) {
+                if (levenshtein_similarity(word, tableName) > 0.8) {//We use levenshtein to make it fuzzy search, typos are allowed
+                    tableFound = tableName;
+                    break;
                 }
-            } else if (operators.containsKey(word)) {
-                opFound = operators.get(word);
-            } else if (word.matches("\\d+")) {
-                valFound = word;
-            } else if (!word.equals(tableFound) && !colFound.isEmpty()) {
-                valFound = "'" + word + "'";
             }
-        }
-        if (tableFound.isEmpty()) tableFound = SchemaMap.keySet().iterator().next();
+            //Finding the columnName IN the tableName
+            for(Map.Entry<String,List<String>> entry: SchemaMap.entrySet()){//checking the entry in the SchemaMap
+                for (String colName : entry.getValue()){
+                    if(levenshtein_similarity(colName,word)>0.8){
+                        colFound=colName;
 
-        return "SELECT * FROM " + tableFound + " WHERE " + colFound + " " + opFound + " " + valFound;
+                        if(tableFound.isEmpty()) tableFound=entry.getKey();
+                        break;
+                    }
+                }
+            }
+
     }
 
     public float getSimilarity(String s1, String s2) {
