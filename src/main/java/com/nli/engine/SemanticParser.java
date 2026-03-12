@@ -48,28 +48,45 @@ public class SemanticParser {
         String opFound = "";
         String valFound = "";
         for (String word : words) {
-            if(stopWords.contains(word)) continue;
+            if (stopWords.contains(word)) continue;
             //Finding the tableName and assigning it to tableFound
-            for(String tableName : SchemaMap.keySet()) {
+            for (String tableName : SchemaMap.keySet()) {
                 if (levenshtein_similarity(word, tableName) > 0.8) {//We use levenshtein to make it fuzzy search, typos are allowed
                     tableFound = tableName;
                     break;
                 }
             }
             //Finding the columnName IN the tableName
-            for(Map.Entry<String,List<String>> entry: SchemaMap.entrySet()){//checking the entry in the SchemaMap
-                for (String colName : entry.getValue()){
-                    if(levenshtein_similarity(colName,word)>0.8){
-                        colFound=colName;
-
-                        if(tableFound.isEmpty()) tableFound=entry.getKey();
+            for (Map.Entry<String, List<String>> entry : SchemaMap.entrySet()) {//checking the entry in the SchemaMap
+                for (String colName : entry.getValue()) {
+                    if (levenshtein_similarity(colName, word) > 0.8) {
+                        colFound = colName;
+                        //This is if we haven't found the table but got the column name we just get it from the entry map
+                        if (tableFound.isEmpty()) tableFound = entry.getKey();
                         break;
                     }
                 }
             }
-
+            //finding operators
+            if (operators.containsKey(word)) {
+                opFound = operators.get(word);
+            }
+            //finding values
+            else if (word.matches("\\d+")) {
+                valFound = word;
+            } else if (!tableFound.isEmpty() && !colFound.isEmpty() && !word.equals(tableFound) && !word.equals(colFound)) {
+                valFound = "'" + recoverCase(word, originalInput) + "'";
+            }
+        }
+        if (tableFound.isEmpty() && !SchemaMap.isEmpty()) {
+            tableFound = SchemaMap.keySet().iterator().next();
+        }
+        //return logic:
+        if (colFound.isEmpty() || opFound.isEmpty() || valFound.isEmpty()) {
+            return "SELECT * FROM " + tableFound;
+        }
+        return "SELECT * FROM " + tableFound + " WHERE " + colFound + " " + opFound + " " + valFound;
     }
-
     public float getSimilarity(String s1, String s2) {
         int i =0;
         float count =0;
