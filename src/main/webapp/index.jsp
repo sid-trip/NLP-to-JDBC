@@ -23,9 +23,7 @@
 
     <!-- The HTML Form: Action points to the @WebServlet("/search") -->
     <form action="search" method="POST">
-        <label>
             <input type="text" name="userInput" class="search-box" placeholder="e.g., Find me the employees who live in the city Bangalore..." required>
-        </label>
         <br>
         <button type="submit" class="btn">Generate SQL</button>
     </form>

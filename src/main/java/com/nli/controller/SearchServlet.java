@@ -25,13 +25,19 @@ public class SearchServlet extends HttpServlet{
         System.out.println("Engin ready!");
     }
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         String userQuery = request.getParameter("userInput");
+        System.out.println("--- NEW REQUEST RECEIVED ---");//DEBUG
+        System.out.println("User typed: " + userQuery);//DEBUG
         if(userQuery!=null && !userQuery.trim().isEmpty()){
             String generatedSql = parser.parse(userQuery);
+            System.out.println("Engine generated: "+generatedSql);//DEBUG
             request.setAttribute("originalQuery",userQuery);
             request.setAttribute("sqlQuery",generatedSql);
+        }else{
+            System.out.println("Returned USER query was empty");
         }
+        System.out.println("Forwarding to index.jsp...");//DEBUG
         request.getRequestDispatcher("index.jsp").forward(request,response);
     }
 
