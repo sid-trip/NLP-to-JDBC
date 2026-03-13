@@ -12,7 +12,7 @@ import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-@WebServlet
+@WebServlet("/search")
 public class SearchServlet extends HttpServlet{
     private SemanticParser parser;
     //Initializing the servlet, access the database exactly once, and getting the parser ready
@@ -33,7 +33,7 @@ public class SearchServlet extends HttpServlet{
             String generatedSql = parser.parse(userQuery);
             System.out.println("Engine generated: "+generatedSql);//DEBUG
             request.setAttribute("originalQuery",userQuery);
-            request.setAttribute("sqlQuery",generatedSql);
+            request.setAttribute("sqlResult",generatedSql);
         }else{
             System.out.println("Returned USER query was empty");
         }
