@@ -24,6 +24,15 @@ public class SearchServlet extends HttpServlet{
         parser = new SemanticParser(schema);
         System.out.println("Engin ready!");
     }
-
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        String userQuery = request.getParameter("userInput");
+        if(userQuery!=null && !userQuery.trim().isEmpty()){
+            String generatedSql = parser.parse(userQuery);
+            request.setAttribute("originalQuery",userQuery);
+            request.setAttribute("sqlQuery",generatedSql);
+        }
+        request.getRequestDispatcher("index.jsp").forward(request,response);
+    }
 
 }
