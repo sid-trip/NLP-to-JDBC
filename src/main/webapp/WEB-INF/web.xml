@@ -6,7 +6,6 @@
          version="4.0">
 
     <display-name>NLP to SQL Engine</display-name>
-
     <servlet>
         <servlet-name>SearchServlet</servlet-name>
         <servlet-class>com.nli.controller.SearchServlet</servlet-class>
