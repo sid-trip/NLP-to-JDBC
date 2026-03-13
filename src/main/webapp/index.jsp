@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,9 +18,8 @@
 <body>
 
 <div class="container">
-    <h1>NLP-to-SQL Translator</h1>
+    <h1 style="color: #a10054;">NLP-to-SQL Translator (V2)</h1>
     <p style="color: #666; margin-bottom: 30px;">Type a natural language query, and our engine will convert it into executable SQL.</p>
-
     <!-- The HTML Form: Action points to the @WebServlet("/search") -->
     <form action="search" method="POST">
             <input type="text" name="userInput" class="search-box" placeholder="e.g., Find me the employees who live in the city Bangalore..." required>
@@ -29,15 +28,11 @@
     </form>
 
     <!-- Dynamic Result Rendering (Only shows if Servlet sends data back) -->
-    <% if(request.getAttribute("sqlResult") != null) { %>
-    <div class="result-card">
-        <div class="label">Natural Language Input:</div>
-        <div style="color: #98c379; margin-bottom: 15px;">"<%= request.getAttribute("originalQuery") %>"</div>
-
-        <div class="label">Generated SQL Statement:</div>
-        <div><%= request.getAttribute("sqlResult") %></div>
+    <div style="margin-top: 50px; border: 2px solid black; padding: 20px;">
+        <h2>DEBUG ZONE</h2>
+        <p><strong>You typed:</strong> ${originalQuery}</p>
+        <p><strong>SQL Result:</strong> ${sqlResult}</p>
     </div>
-    <% } %>
 </div>
 
 </body>

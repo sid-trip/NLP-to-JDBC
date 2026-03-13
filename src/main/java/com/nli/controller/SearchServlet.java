@@ -38,7 +38,7 @@ public class SearchServlet extends HttpServlet{
             System.out.println("Returned USER query was empty");
         }
         System.out.println("Forwarding to index.jsp...");//DEBUG
-        request.getRequestDispatcher("index.jsp").forward(request,response);
+        request.getRequestDispatcher("/index.jsp").forward(request,response);
     }
 
 }
